@@ -32,7 +32,7 @@ spec:
             - containerPort: 3000
           env:
             - name: NEXT_PUBLIC_API_URL
-              value: "http://homelable-service:8000"
+              value: "http://backend:8000"
 
       volumes:
         - name: data-storage
