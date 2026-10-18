@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homelable
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: app
+  template:
+    metadata:
+      labels:
+        component: app
+    spec:
+      containers:
+        # Контейнер Бэкенда (API и логика)
+        - name: backend
+          image: ghcr.io/pouzor/homelable-backend:latest
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - secretRef:
+                name: homelable-env-secrets
+          volumeMounts:
+            - name: data-storage
+              mountPath: /app/data
+
+        # Контейнер Фронтенда (Интерфейс)
+        - name: frontend
+          image: ghcr.io/pouzor/homelable-frontend:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NEXT_PUBLIC_API_URL
+              value: "http://homelable-service:8000"
+
+      volumes:
+        - name: data-storage
+          persistentVolumeClaim:
+            claimName: homelable-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: homelable-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi

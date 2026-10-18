@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+# Перечисляем все файлы манифестов
+resources:
+  - deployment.yaml
+  - services.yaml
+
+# Генерируем секреты из файла secrets.env
+secretGenerator:
+  - name: homelable-env-secrets
+    envs:
+      - secrets.env
+
+# Общие настройки для всех компонентов
+namespace: homelab
+commonLabels:
+  app: homelable
